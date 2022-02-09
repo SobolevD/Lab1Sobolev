@@ -1,8 +1,11 @@
 import json
 
-from PIL import Image
+import numpy as np
+from matplotlib import pyplot as plt
 from skimage import transform
-from skimage.io import imread, imsave
+from skimage.exposure import histogram
+from skimage.io import imread
+from skimage.io import imshow
 
 
 def read_parameters(file_path):
@@ -36,23 +39,45 @@ def affine_transform_image(img, scale_xy, shift_xy, angle):
     return tf_img
 
 
-def save_image(img, file_path):
-    # imageio.imwrite(file_path, img)#img.save(file_path, 'png')
-    imsave(file_path, img)
+def create_union_plot(img1, img2):
+    fig = plt.figure(figsize=(10, 5))
+    fig.add_subplot(2, 2, 1)
+    imshow(img1)
+    fig.add_subplot(2, 2, 2)
+    imshow(img2)
+    fig.add_subplot(2, 2, 3)
+    create_histogram_plot(img1)
+    fig.add_subplot(2, 2, 4)
+    create_histogram_plot(img2)
+    return fig
 
 
-parameters = read_parameters('resources/application_properties.json')
+def create_histogram_plot(img_array):
+    hist_red, bins_red = histogram(img_array[:, :, 2])
+    hist_green, bins_green = histogram(img_array[:, :, 1])
+    hist_blue, bins_blue = histogram(img_array[:, :, 0])
 
-v_img = read_image(parameters['source_image_path'])
-v_scale_xy = parameters['scale_XY']
-v_shift_xy = parameters['shift_XY']
-v_angle = parameters['angle']
+    plt.ylabel('Number of counts')
+    plt.xlabel('Brightness')
+    plt.title('Histogram of the brightness distribution for each channel')
+    plt.plot(bins_green, hist_green, color='green', linestyle='-', linewidth=1)
+    plt.plot(bins_red, hist_red, color='red', linestyle='-', linewidth=1)
+    plt.plot(bins_blue, hist_blue, color='blue', linestyle='-', linewidth=1)
+    plt.legend(['green', 'red', 'blue'])
 
-v_result = affine_transform_image(v_img, v_scale_xy, v_shift_xy, v_angle)
-im = Image.fromarray(v_result, 'RGB')
 
-#fig, ax = plt.subplots()
-#ax.imshow(v_result)
-#show()
+def main():
+    parameters = read_parameters('resources/application_properties.json')
 
-save_image(v_result, parameters['destination_image_path'])
+    v_img = read_image(parameters['source_image_path'])
+
+    v_scale_xy = parameters['scale_XY']
+    v_shift_xy = parameters['shift_XY']
+    v_angle = parameters['angle']
+
+    v_result = affine_transform_image(v_img, v_scale_xy, v_shift_xy, v_angle)
+
+    v_plot_result = create_union_plot(v_img, v_result)
+
+    v_plot_result.savefig(parameters['destination_image_path'])
+
