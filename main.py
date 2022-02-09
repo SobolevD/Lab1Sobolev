@@ -1,11 +1,20 @@
 import json
 
-import numpy as np
 from matplotlib import pyplot as plt
 from skimage import transform
 from skimage.exposure import histogram
 from skimage.io import imread
 from skimage.io import imshow
+
+SOURCE_IMAGE_PATH_PARAM = 'source_image_path'
+DESTINATION_IMAGE_PATH_PARAM = 'destination_image_path'
+SCALE_XY_PARAM = 'scale_XY'
+SHIFT_XY_PARAM = 'shift_XY'
+ANGLE_PARAM = 'angle'
+
+RED_COLOR_PARAM = 'red'
+BLUE_COLOR_PARAM = 'blue'
+GREEN_COLOR_PARAM = 'green'
 
 
 def read_parameters(file_path):
@@ -40,7 +49,7 @@ def affine_transform_image(img, scale_xy, shift_xy, angle):
 
 
 def create_union_plot(img1, img2):
-    fig = plt.figure(figsize=(10, 5))
+    fig = plt.figure(figsize=(1500, 1500))
     fig.add_subplot(2, 2, 1)
     imshow(img1)
     fig.add_subplot(2, 2, 2)
@@ -63,21 +72,20 @@ def create_histogram_plot(img_array):
     plt.plot(bins_green, hist_green, color='green', linestyle='-', linewidth=1)
     plt.plot(bins_red, hist_red, color='red', linestyle='-', linewidth=1)
     plt.plot(bins_blue, hist_blue, color='blue', linestyle='-', linewidth=1)
-    plt.legend(['green', 'red', 'blue'])
+    plt.legend([GREEN_COLOR_PARAM, RED_COLOR_PARAM, BLUE_COLOR_PARAM])
 
 
 def main():
     parameters = read_parameters('resources/application_properties.json')
 
-    v_img = read_image(parameters['source_image_path'])
+    v_img = read_image(parameters[SOURCE_IMAGE_PATH_PARAM])
 
-    v_scale_xy = parameters['scale_XY']
-    v_shift_xy = parameters['shift_XY']
-    v_angle = parameters['angle']
+    v_scale_xy = parameters[SCALE_XY_PARAM]
+    v_shift_xy = parameters[SHIFT_XY_PARAM]
+    v_angle = parameters[ANGLE_PARAM]
 
     v_result = affine_transform_image(v_img, v_scale_xy, v_shift_xy, v_angle)
 
     v_plot_result = create_union_plot(v_img, v_result)
 
-    v_plot_result.savefig(parameters['destination_image_path'])
-
+    v_plot_result.savefig(parameters[DESTINATION_IMAGE_PATH_PARAM])
