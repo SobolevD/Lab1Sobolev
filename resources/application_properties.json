@@ -1,7 +1,7 @@
 {
-  "source_image_path": "resources/input.jpg",
-  "destination_image_path": "resources/output.jpg",
-  "scale_XY": [1, 1],
-  "shift_XY": [0, 0],
-  "angle": 3.141592653589793
+  "source_image_path":      "resources/img/input.jpg",
+  "destination_image_path": "resources/img/output.jpg",
+  "scale_XY":               [1, 1],
+  "shift_XY":               [0, 0],
+  "angle":                  0
 }
